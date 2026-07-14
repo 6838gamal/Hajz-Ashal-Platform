@@ -14,7 +14,7 @@ from core.presentation.middlewares import RequestIdMiddleware, TenantContextMidd
 
 settings = get_settings()
 
-app = FastAPI(title="Appointments SaaS Platform", version="0.1.0")
+app = FastAPI(title="حجز أسهل", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
