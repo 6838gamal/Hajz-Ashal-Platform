@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+{% block title %}لوحة تحكم المنشأة — حجز أسهل{% endblock %}
+
+{% block head %}
+<style>
+  /* hide global navbar on dashboard pages */
+  .navbar { display: none; }
+  footer  { display: none; }
+  body    { background: var(--bg); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== TOP NAVBAR ===== -->
+<header style="background:#0d1f2d;color:#c8d6e0;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.3);">
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button id="sidebar-toggle" onclick="toggleSidebar()" style="background:none;border:none;color:#94b0be;font-size:1.2rem;cursor:pointer;padding:.25rem .4rem;border-radius:6px;" title="إخفاء/إظهار القائمة">☰</button>
+    <a href="/" style="display:flex;align-items:center;gap:.5rem;text-decoration:none;">
+      <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;">🏥</div>
+      <span style="font-weight:800;color:#e8f4f8;font-size:1rem;">حجز أسهل</span>
+    </a>
+    <span style="color:#2a4050;font-size:.9rem;">|</span>
+    <span id="topbar-tenant" style="color:#7a99aa;font-size:.85rem;">المنشأة</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem;">
+    <button style="background:none;border:none;color:#94b0be;font-size:1.1rem;cursor:pointer;" title="الإشعارات">🔔</button>
+    <div style="display:flex;align-items:center;gap:.5rem;cursor:pointer;" onclick="toggleUserMenu()">
+      <div id="topbar-avatar" style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;">م</div>
+      <span id="topbar-name" style="font-size:.85rem;color:#c8d6e0;">مدير</span>
+      <span style="color:#4a6575;font-size:.75rem;">▾</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== SHELL ===== -->
+<div class="dash-shell">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- User info -->
+    <div class="sidebar-header">
+      <div class="sidebar-avatar" id="sb-avatar">م</div>
+      <div>
+        <div class="sidebar-user-name" id="sb-name">مدير المنشأة</div>
+        <div class="sidebar-user-role">مدير المنشأة · RBAC Admin</div>
+      </div>
+    </div>
+
+    <!-- SECTION: الرئيسية -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">الرئيسية</div>
+      <a class="sidebar-item active" href="/dashboard/admin" onclick="setPage('home',this)">
+        <span class="si-icon">📊</span>
+        <span class="si-label">لوحة التحكم</span>
+      </a>
+    </div>
+
+    <!-- SECTION: العيادة -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">إدارة العيادة</div>
+      <a class="sidebar-item" href="/dashboard/admin?p=clinics" onclick="setPage('clinics',this)">
+        <span class="si-icon">🏥</span>
+        <span class="si-label">العيادات</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=doctors" onclick="setPage('doctors',this)">
+        <span class="si-icon">👨‍⚕️</span>
+        <span class="si-label">الأطباء</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=services" onclick="setPage('services',this)">
+        <span class="si-icon">💊</span>
+        <span class="si-label">الخدمات الطبية</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=rooms" onclick="setPage('rooms',this)">
+        <span class="si-icon">🚪</span>
+        <span class="si-label">الغرف والمقصورات</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: المواعيد -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">المواعيد</div>
+      <a class="sidebar-item" href="/dashboard/admin?p=appointments" onclick="setPage('appointments',this)">
+        <span class="si-icon">📅</span>
+        <span class="si-label">جدول المواعيد</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=waitlist" onclick="setPage('waitlist',this)">
+        <span class="si-icon">⏳</span>
+        <span class="si-label">قوائم الانتظار</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: المرضى -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">المرضى</div>
+      <a class="sidebar-item" href="/dashboard/admin?p=patients" onclick="setPage('patients',this)">
+        <span class="si-icon">👥</span>
+        <span class="si-label">قائمة المرضى</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: الإدارة -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">إدارة المنشأة</div>
+      <a class="sidebar-item" href="/dashboard/admin?p=branches" onclick="setPage('branches',this)">
+        <span class="si-icon">🏢</span>
+        <span class="si-label">الفروع</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=users" onclick="setPage('users',this)">
+        <span class="si-icon">👤</span>
+        <span class="si-label">المستخدمون والفريق</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=roles" onclick="setPage('roles',this)">
+        <span class="si-icon">🔐</span>
+        <span class="si-label">الأدوار والصلاحيات</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: المالية -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">المالية والتقارير</div>
+      <a class="sidebar-item" href="/dashboard/admin?p=billing" onclick="setPage('billing',this)">
+        <span class="si-icon">💳</span>
+        <span class="si-label">الفواتير والمدفوعات</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=reports" onclick="setPage('reports',this)">
+        <span class="si-icon">📈</span>
+        <span class="si-label">التقارير والتحليلات</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=subscription" onclick="setPage('subscription',this)">
+        <span class="si-icon">⭐</span>
+        <span class="si-label">الاشتراك والخطة</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: النظام -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">النظام</div>
+      <a class="sidebar-item" href="/dashboard/admin?p=notifications" onclick="setPage('notifications',this)">
+        <span class="si-icon">🔔</span>
+        <span class="si-label">الإشعارات</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=audit" onclick="setPage('audit',this)">
+        <span class="si-icon">📋</span>
+        <span class="si-label">سجل التدقيق</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/admin?p=settings" onclick="setPage('settings',this)">
+        <span class="si-icon">⚙️</span>
+        <span class="si-label">إعدادات المنشأة</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <a class="sidebar-item" href="/docs" target="_blank">
+        <span class="si-icon">📖</span>
+        <span class="si-label">واجهة API (Swagger)</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="Auth.clear();location.href='/';return false;" style="color:#e05555;">
+        <span class="si-icon">🚪</span>
+        <span class="si-label">تسجيل الخروج</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="dash-main">
+
+    <!-- Top bar -->
+    <div class="dash-topbar">
+      <h1 id="page-title">لوحة التحكم</h1>
+      <div class="topbar-right">
+        <span id="topbar-date" style="font-size:.82rem;color:var(--text-muted);"></span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="dash-body">
+
+      <!-- ===== HOME PAGE ===== -->
+      <div id="page-home">
+
+        <!-- Welcome -->
+        <div class="welcome-banner" style="margin-bottom:1.5rem;">
+          <h2 id="welcome-name">مرحباً 👋</h2>
+          <p id="welcome-sub"></p>
+        </div>
+
+        <!-- KPIs -->
+        <div class="stats-grid" style="margin-bottom:1.5rem;">
+          <div class="stat-card">
+            <div class="stat-label">المواعيد اليوم</div>
+            <div class="stat-val" style="color:var(--primary);">—</div>
+            <div class="stat-note">يتطلب موديول المواعيد</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">إجمالي المرضى</div>
+            <div class="stat-val" style="color:var(--accent);">—</div>
+            <div class="stat-note">يتطلب موديول المرضى</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">الأطباء النشطون</div>
+            <div class="stat-val" style="color:#8b5cf6;">—</div>
+            <div class="stat-note">يتطلب موديول الأطباء</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">إيرادات الشهر</div>
+            <div class="stat-val" style="color:#059669;">—</div>
+            <div class="stat-note">يتطلب موديول الفواتير</div>
+          </div>
+        </div>
+
+        <!-- Account Info -->
+        <div class="grid-2">
+          <div class="info-card">
+            <h3>📋 معلومات الحساب</h3>
+            <div class="info-row">
+              <span class="label">الاسم</span>
+              <span class="value" id="info-name">—</span>
+            </div>
+            <div class="info-row">
+              <span class="label">البريد الإلكتروني</span>
+              <span class="value" id="info-email" dir="ltr">—</span>
+            </div>
+            <div class="info-row">
+              <span class="label">المنشأة</span>
+              <span class="value" id="info-tenant">—</span>
+            </div>
+            <div class="info-row">
+              <span class="label">الدور</span>
+              <span class="value"><span class="badge badge-primary" id="info-role">مدير المنشأة</span></span>
+            </div>
+            <div class="info-row">
+              <span class="label">معرّف المنشأة</span>
+              <span class="value" style="display:flex;align-items:center;gap:.5rem;">
+                <span id="info-tenant-id" dir="ltr" style="font-size:.78rem;color:var(--text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
+                <button onclick="copyTenantId()" style="background:none;border:none;cursor:pointer;font-size:.85rem;" title="نسخ">📋</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h3>🗺️ خارطة الطريق — الموديولات القادمة</h3>
+            <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;">
+              <div style="display:flex;align-items:center;gap:.6rem;font-size:.85rem;">
+                <span style="color:var(--success);">✅</span> Tenants + Identity + RBAC (مكتمل)
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;font-size:.85rem;">
+                <span style="color:#f59e0b;">🔄</span> Clinics + Doctors + Patients (المرحلة الثانية)
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;font-size:.85rem;">
+                <span style="color:var(--text-muted);">⏳</span> محرك المواعيد (المرحلة الثالثة)
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;font-size:.85rem;">
+                <span style="color:var(--text-muted);">⏳</span> الفواتير والتقارير والاشتراكات
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;font-size:.85rem;">
+                <span style="color:var(--text-muted);">⏳</span> الإشعارات + سجل التدقيق + الإعدادات
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Roles & Permissions -->
+        <div class="info-card" style="margin-top:1.5rem;">
+          <h3>🔐 الأدوار والصلاحيات المُضمَّنة في JWT</h3>
+          <div id="roles-section" style="margin-top:.75rem;">
+            <div id="roles-empty" class="alert alert-info show" style="font-size:.85rem;display:none;">
+              لم تُعيَّن أدوار بعد. يمكن تعيين الأدوار عبر RBAC API.
+            </div>
+            <div id="roles-list">
+              <div class="info-row">
+                <span class="label">الأدوار</span>
+                <span class="value" id="roles-val"><span class="badge badge-gray">لا يوجد بعد</span></span>
+              </div>
+              <div class="info-row">
+                <span class="label">الصلاحيات</span>
+                <span id="permissions-val" class="value" style="font-size:.8rem;color:var(--text-muted);">لا يوجد بعد — تُضاف تلقائياً عند تعيين الأدوار</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /page-home -->
+
+      <!-- ===== COMING SOON PLACEHOLDER ===== -->
+      <div id="page-soon" style="display:none;">
+        <div style="text-align:center;padding:5rem 2rem;">
+          <div style="font-size:4rem;margin-bottom:1rem;">🚧</div>
+          <h2 style="font-size:1.5rem;margin-bottom:.5rem;" id="soon-title">قريباً</h2>
+          <p style="color:var(--text-muted);" id="soon-desc">هذا القسم سيكون متاحاً في المرحلة القادمة من التطوير.</p>
+        </div>
+      </div>
+
+    </div><!-- /dash-body -->
+  </div><!-- /dash-main -->
+</div><!-- /dash-shell -->
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+if (!Auth.isLoggedIn()) { location.href = '/login'; }
+
+const info   = Auth.getUserInfo() || {};
+const claims = Auth.getAccess() ? decodeJWT(Auth.getAccess()) : {};
+
+/* ---- Populate header & sidebar ---- */
+const firstName = (info.full_name || 'م').charAt(0);
+document.getElementById('sb-avatar').textContent      = firstName;
+document.getElementById('topbar-avatar').textContent  = firstName;
+document.getElementById('sb-name').textContent        = info.full_name || 'مدير';
+document.getElementById('topbar-name').textContent    = info.full_name || 'مدير';
+document.getElementById('topbar-tenant').textContent  = info.tenant_name || '';
+
+/* ---- Populate home page ---- */
+document.getElementById('welcome-name').textContent = 'مرحباً، ' + (info.full_name || 'مدير') + ' 👋';
+document.getElementById('welcome-sub').textContent  = (info.tenant_name || '') + ' · لوحة تحكم المنشأة';
+document.getElementById('info-name').textContent    = info.full_name    || '—';
+document.getElementById('info-email').textContent   = info.email        || '—';
+document.getElementById('info-tenant').textContent  = info.tenant_name  || '—';
+document.getElementById('info-role').textContent    = info.role_label   || 'مدير المنشأة';
+document.getElementById('info-tenant-id').textContent = info.tenant_id || claims.tenant_id || '—';
+
+const roles       = claims.roles       || info.roles       || [];
+const permissions = claims.permissions || info.permissions || [];
+if (roles.length) {
+  document.getElementById('roles-val').innerHTML =
+    roles.map(r => `<span class="badge badge-primary" style="margin-left:.25rem;">${r}</span>`).join('');
+}
+if (permissions.length) {
+  document.getElementById('permissions-val').textContent = permissions.join(' · ');
+  document.getElementById('permissions-val').style.color = 'var(--text)';
+  document.getElementById('permissions-val').style.fontSize = '.78rem';
+}
+
+/* ---- Date ---- */
+const now = new Date();
+document.getElementById('topbar-date').textContent =
+  now.toLocaleDateString('ar-SA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+/* ---- Sidebar toggle ---- */
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.style.width = sb.style.width === '0px' ? '260px' : '0px';
+  sb.style.overflow = sb.style.width === '0px' ? 'hidden' : '';
+}
+
+/* ---- Page routing ---- */
+const pageLabels = {
+  home:          'لوحة التحكم',
+  clinics:       'العيادات',
+  doctors:       'الأطباء',
+  services:      'الخدمات الطبية',
+  rooms:         'الغرف والمقصورات',
+  appointments:  'جدول المواعيد',
+  waitlist:      'قوائم الانتظار',
+  patients:      'قائمة المرضى',
+  branches:      'الفروع',
+  users:         'المستخدمون والفريق',
+  roles:         'الأدوار والصلاحيات',
+  billing:       'الفواتير والمدفوعات',
+  reports:       'التقارير والتحليلات',
+  subscription:  'الاشتراك والخطة',
+  notifications: 'الإشعارات',
+  audit:         'سجل التدقيق',
+  settings:      'إعدادات المنشأة',
+};
+const pageDescs = {
+  clinics:      'إدارة العيادات ضمن فروع المنشأة.',
+  doctors:      'إضافة الأطباء وربطهم بالعيادات والخدمات.',
+  services:     'تعريف الخدمات الطبية القابلة للحجز.',
+  rooms:        'إدارة الغرف والمقصورات داخل كل عيادة.',
+  appointments: 'عرض وإدارة جدول المواعيد اليومي والأسبوعي.',
+  waitlist:     'إدارة قوائم الانتظار التلقائية عند امتلاء الأوقات.',
+  patients:     'قائمة المرضى المسجلين في المنشأة.',
+  branches:     'إنشاء وإدارة فروع المنشأة.',
+  users:        'إدارة المستخدمين والفريق داخل المنشأة.',
+  roles:        'تعيين الأدوار والصلاحيات لكل عضو في الفريق.',
+  billing:      'متابعة الفواتير والمدفوعات لكل موعد وخدمة.',
+  reports:      'تقارير KPIs وتحليلات الأداء والإيرادات.',
+  subscription: 'تفاصيل خطة الاشتراك والحدود المتاحة.',
+  notifications:'إعداد الإشعارات التلقائية (تذكير، تأكيد، إلغاء).',
+  audit:        'سجل كامل لكل العمليات الحساسة داخل المنشأة.',
+  settings:     'إعدادات المنشأة والفروع والتوطين.',
+};
+
+function setPage(key, el) {
+  // Update active sidebar item
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  // Update title
+  document.getElementById('page-title').textContent = pageLabels[key] || key;
+
+  // Show/hide pages
+  document.getElementById('page-home').style.display = key === 'home' ? '' : 'none';
+  document.getElementById('page-soon').style.display = key !== 'home' ? '' : 'none';
+
+  if (key !== 'home') {
+    document.getElementById('soon-title').textContent = pageLabels[key] || key;
+    document.getElementById('soon-desc').textContent  = pageDescs[key] || 'هذا القسم سيكون متاحاً قريباً.';
+  }
+}
+
+/* ---- Read page from URL ---- */
+const urlPage = new URLSearchParams(location.search).get('p') || 'home';
+if (urlPage !== 'home') {
+  const matchEl = document.querySelector(`.sidebar-item[href*="p=${urlPage}"]`);
+  setPage(urlPage, matchEl);
+}
+
+function copyTenantId() {
+  const id = info.tenant_id || claims.tenant_id;
+  if (!id) return;
+  navigator.clipboard.writeText(id).then(() => {
+    const btn = event.target;
+    btn.textContent = '✅'; setTimeout(() => btn.textContent = '📋', 1500);
+  });
+}
+
+function toggleUserMenu() {
+  // placeholder
+}
+</script>
+{% endblock %}

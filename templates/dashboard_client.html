@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block title %}لوحة حسابي — حجز أسهل{% endblock %}
+
+{% block head %}
+<style>
+  .navbar { display: none; }
+  footer  { display: none; }
+  body    { background: var(--bg); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== TOP NAVBAR ===== -->
+<header style="background:#0d1f2d;color:#c8d6e0;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.3);">
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button onclick="toggleSidebar()" style="background:none;border:none;color:#94b0be;font-size:1.2rem;cursor:pointer;padding:.25rem .4rem;border-radius:6px;">☰</button>
+    <a href="/" style="display:flex;align-items:center;gap:.5rem;text-decoration:none;">
+      <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;">🏥</div>
+      <span style="font-weight:800;color:#e8f4f8;font-size:1rem;">حجز أسهل</span>
+    </a>
+    <span style="color:#2a4050;font-size:.9rem;">|</span>
+    <span id="topbar-tenant" style="color:#7a99aa;font-size:.85rem;"></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem;">
+    <button style="background:none;border:none;color:#94b0be;font-size:1.1rem;cursor:pointer;" title="الإشعارات">🔔</button>
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <div id="topbar-avatar" style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#1ab380);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;">ع</div>
+      <span id="topbar-name" style="font-size:.85rem;color:#c8d6e0;">عميل</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== SHELL ===== -->
+<div class="dash-shell">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- User info -->
+    <div class="sidebar-header">
+      <div class="sidebar-avatar" id="sb-avatar" style="background:linear-gradient(135deg,var(--accent),#1ab380);">ع</div>
+      <div>
+        <div class="sidebar-user-name" id="sb-name">مستخدم</div>
+        <div class="sidebar-user-role" id="sb-tenant">عميل / مريض</div>
+      </div>
+    </div>
+
+    <!-- SECTION: حسابي -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">حسابي</div>
+      <a class="sidebar-item active" href="/dashboard/client" onclick="setPage('home',this)">
+        <span class="si-icon">🏠</span>
+        <span class="si-label">الصفحة الرئيسية</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/client?p=profile" onclick="setPage('profile',this)">
+        <span class="si-icon">👤</span>
+        <span class="si-label">ملفي الشخصي</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: المواعيد -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">المواعيد</div>
+      <a class="sidebar-item" href="/dashboard/client?p=book" onclick="setPage('book',this)">
+        <span class="si-icon">➕</span>
+        <span class="si-label">حجز موعد جديد</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/client?p=my-appointments" onclick="setPage('my-appointments',this)">
+        <span class="si-icon">📅</span>
+        <span class="si-label">مواعيدي</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/client?p=history" onclick="setPage('history',this)">
+        <span class="si-icon">📂</span>
+        <span class="si-label">سجل المواعيد السابقة</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/client?p=waitlist" onclick="setPage('waitlist',this)">
+        <span class="si-icon">⏳</span>
+        <span class="si-label">قائمة انتظاري</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: السجلات الطبية -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">السجلات الطبية</div>
+      <a class="sidebar-item" href="/dashboard/client?p=records" onclick="setPage('records',this)">
+        <span class="si-icon">📋</span>
+        <span class="si-label">سجلاتي الطبية</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+      <a class="sidebar-item" href="/dashboard/client?p=files" onclick="setPage('files',this)">
+        <span class="si-icon">📎</span>
+        <span class="si-label">ملفاتي ونتائجي</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: المالية -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">المالية</div>
+      <a class="sidebar-item" href="/dashboard/client?p=invoices" onclick="setPage('invoices',this)">
+        <span class="si-icon">💳</span>
+        <span class="si-label">فواتيري</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- SECTION: التواصل -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">التواصل</div>
+      <a class="sidebar-item" href="/dashboard/client?p=notifications" onclick="setPage('notifications',this)">
+        <span class="si-icon">🔔</span>
+        <span class="si-label">إشعاراتي</span>
+        <span class="si-soon">قريباً</span>
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <a class="sidebar-item" href="#" onclick="Auth.clear();location.href='/';return false;" style="color:#e05555;">
+        <span class="si-icon">🚪</span>
+        <span class="si-label">تسجيل الخروج</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="dash-main">
+
+    <div class="dash-topbar">
+      <h1 id="page-title">الصفحة الرئيسية</h1>
+      <div class="topbar-right">
+        <span id="topbar-date" style="font-size:.82rem;color:var(--text-muted);"></span>
+      </div>
+    </div>
+
+    <div class="dash-body">
+
+      <!-- ===== HOME ===== -->
+      <div id="page-home">
+
+        <div class="welcome-banner" style="margin-bottom:1.5rem;background:linear-gradient(135deg,#0a7a6f,var(--accent));">
+          <h2 id="welcome-name">مرحباً 👋</h2>
+          <p id="welcome-sub"></p>
+        </div>
+
+        <!-- Quick cards -->
+        <div class="stats-grid" style="margin-bottom:1.5rem;">
+          <div class="stat-card" style="cursor:pointer;" onclick="setPage('book', document.querySelector('[href*=\'p=book\']'))">
+            <div style="font-size:2rem;margin-bottom:.4rem;">➕</div>
+            <div class="stat-label" style="font-size:.95rem;font-weight:600;color:var(--primary);">احجز موعداً جديداً</div>
+            <div class="stat-note">اختر الطبيب والخدمة والوقت المناسب</div>
+          </div>
+          <div class="stat-card" style="cursor:pointer;" onclick="setPage('my-appointments', document.querySelector('[href*=\'p=my-appointments\']'))">
+            <div style="font-size:2rem;margin-bottom:.4rem;">📅</div>
+            <div class="stat-label" style="font-size:.95rem;font-weight:600;color:var(--accent);">مواعيدي القادمة</div>
+            <div class="stat-note">—  لا توجد مواعيد حالياً</div>
+          </div>
+          <div class="stat-card" style="cursor:pointer;" onclick="setPage('records', document.querySelector('[href*=\'p=records\']'))">
+            <div style="font-size:2rem;margin-bottom:.4rem;">📋</div>
+            <div class="stat-label" style="font-size:.95rem;font-weight:600;color:#8b5cf6;">سجلاتي الطبية</div>
+            <div class="stat-note">تقارير ونتائج فحوصاتي</div>
+          </div>
+          <div class="stat-card" style="cursor:pointer;" onclick="setPage('invoices', document.querySelector('[href*=\'p=invoices\']'))">
+            <div style="font-size:2rem;margin-bottom:.4rem;">💳</div>
+            <div class="stat-label" style="font-size:.95rem;font-weight:600;color:#059669;">فواتيري</div>
+            <div class="stat-note">— لا توجد فواتير مستحقة</div>
+          </div>
+        </div>
+
+        <!-- Account info -->
+        <div class="info-card">
+          <h3>📋 بياناتي الشخصية</h3>
+          <div class="info-row">
+            <span class="label">الاسم</span>
+            <span class="value" id="info-name">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label">البريد الإلكتروني</span>
+            <span class="value" id="info-email" dir="ltr">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label">المنشأة المسجّل فيها</span>
+            <span class="value" id="info-tenant">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label">نوع الحساب</span>
+            <span class="value"><span class="badge badge-success">عميل / مريض</span></span>
+          </div>
+        </div>
+
+      </div><!-- /page-home -->
+
+      <!-- ===== COMING SOON ===== -->
+      <div id="page-soon" style="display:none;">
+        <div style="text-align:center;padding:5rem 2rem;">
+          <div style="font-size:4rem;margin-bottom:1rem;">🚧</div>
+          <h2 style="font-size:1.5rem;margin-bottom:.5rem;" id="soon-title">قريباً</h2>
+          <p style="color:var(--text-muted);" id="soon-desc">هذا القسم سيكون متاحاً في المرحلة القادمة.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+if (!Auth.isLoggedIn()) { location.href = '/login'; }
+
+const info   = Auth.getUserInfo() || {};
+const claims = Auth.getAccess() ? decodeJWT(Auth.getAccess()) : {};
+
+const firstName = (info.full_name || 'ع').charAt(0);
+document.getElementById('sb-avatar').textContent     = firstName;
+document.getElementById('topbar-avatar').textContent = firstName;
+document.getElementById('sb-name').textContent       = info.full_name   || 'عميل';
+document.getElementById('topbar-name').textContent   = info.full_name   || 'عميل';
+document.getElementById('sb-tenant').textContent     = info.tenant_name || 'عميل / مريض';
+document.getElementById('topbar-tenant').textContent = info.tenant_name || '';
+
+document.getElementById('welcome-name').textContent = 'مرحباً، ' + (info.full_name || 'عميل') + ' 👋';
+document.getElementById('welcome-sub').textContent  = (info.tenant_name || '') + ' · بوابة العميل';
+document.getElementById('info-name').textContent    = info.full_name   || '—';
+document.getElementById('info-email').textContent   = info.email       || '—';
+document.getElementById('info-tenant').textContent  = info.tenant_name || '—';
+
+const now = new Date();
+document.getElementById('topbar-date').textContent =
+  now.toLocaleDateString('ar-SA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.style.width = sb.style.width === '0px' ? '260px' : '0px';
+}
+
+const pageLabels = {
+  home:             'الصفحة الرئيسية',
+  profile:          'ملفي الشخصي',
+  book:             'حجز موعد جديد',
+  'my-appointments':'مواعيدي',
+  history:          'سجل المواعيد',
+  waitlist:         'قائمة انتظاري',
+  records:          'سجلاتي الطبية',
+  files:            'ملفاتي ونتائجي',
+  invoices:         'فواتيري',
+  notifications:    'إشعاراتي',
+};
+const pageDescs = {
+  profile:          'تحديث بياناتك الشخصية وكلمة المرور.',
+  book:             'اختر الطبيب والخدمة والوقت المناسب لك.',
+  'my-appointments':'مواعيدك القادمة مع تفاصيل الطبيب والخدمة.',
+  history:          'سجل كامل بمواعيدك السابقة وتفاصيلها.',
+  waitlist:         'متابعة وضعك في قوائم الانتظار.',
+  records:          'سجلاتك الطبية وتقارير الفحوصات.',
+  files:            'ملفاتك المرفوعة ونتائج التحاليل والأشعة.',
+  invoices:         'فواتيرك وإيصالات الدفع.',
+  notifications:    'إشعارات تذكير المواعيد والتأكيدات.',
+};
+
+function setPage(key, el) {
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent = pageLabels[key] || key;
+  document.getElementById('page-home').style.display = key === 'home' ? '' : 'none';
+  document.getElementById('page-soon').style.display = key !== 'home' ? '' : 'none';
+  if (key !== 'home') {
+    document.getElementById('soon-title').textContent = pageLabels[key] || key;
+    document.getElementById('soon-desc').textContent  = pageDescs[key] || 'هذا القسم سيكون متاحاً قريباً.';
+  }
+}
+
+const urlPage = new URLSearchParams(location.search).get('p') || 'home';
+if (urlPage !== 'home') {
+  const matchEl = document.querySelector(`.sidebar-item[href*="p=${urlPage}"]`);
+  setPage(urlPage, matchEl);
+}
+</script>
+{% endblock %}
