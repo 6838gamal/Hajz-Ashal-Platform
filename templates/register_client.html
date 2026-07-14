@@ -58,41 +58,66 @@
       </div>
     </div>
 
-    <!-- STEP 2: Client user info -->
+    <!-- STEP 2: Register or Login tabs -->
     <div id="step-2" style="display:none;">
-      <div class="alert alert-info show" id="tenant-confirm-box" style="font-size:.85rem;">
-        ستُسجَّل في منشأة: <strong id="confirm-tenant-name"></strong>
+
+      <div class="alert alert-info show" id="tenant-confirm-box" style="font-size:.85rem;margin-bottom:1rem;">
+        المنشأة المختارة: <strong id="confirm-tenant-name"></strong>
       </div>
 
-      <div class="form-group">
-        <label for="full_name">الاسم الكامل</label>
-        <input id="full_name" class="form-control" type="text" placeholder="سارة أحمد" autocomplete="name">
-        <div id="full_name_err" class="field-error"></div>
+      <!-- Tab switcher -->
+      <div class="auth-tabs" id="auth-tabs">
+        <button class="auth-tab active" id="tab-register" onclick="switchTab('register')">حساب جديد</button>
+        <button class="auth-tab"        id="tab-login"    onclick="switchTab('login')">تسجيل الدخول</button>
       </div>
 
-      <div class="form-group">
-        <label for="email">البريد الإلكتروني</label>
-        <input id="email" class="form-control" type="email" placeholder="sara@example.com" dir="ltr" autocomplete="email">
-        <div id="email_err" class="field-error"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="password">كلمة المرور <span class="hint">— ٨ أحرف على الأقل</span></label>
-        <div class="password-wrapper">
-          <input id="password" class="form-control" type="password" placeholder="••••••••" autocomplete="new-password">
-          <button type="button" class="toggle-pw" onclick="togglePassword('password')">👁</button>
+      <!-- Panel: Register -->
+      <div id="panel-register">
+        <div class="form-group">
+          <label for="full_name">الاسم الكامل</label>
+          <input id="full_name" class="form-control" type="text" placeholder="سارة أحمد" autocomplete="name">
+          <div id="full_name_err" class="field-error"></div>
         </div>
-        <div id="password_err" class="field-error"></div>
+        <div class="form-group">
+          <label for="reg_email">البريد الإلكتروني</label>
+          <input id="reg_email" class="form-control" type="email" placeholder="sara@example.com" dir="ltr" autocomplete="email">
+          <div id="reg_email_err" class="field-error"></div>
+        </div>
+        <div class="form-group">
+          <label for="reg_password">كلمة المرور <span class="hint">— ٨ أحرف على الأقل</span></label>
+          <div class="password-wrapper">
+            <input id="reg_password" class="form-control" type="password" placeholder="••••••••" autocomplete="new-password">
+            <button type="button" class="toggle-pw" onclick="togglePassword('reg_password')">👁</button>
+          </div>
+          <div id="reg_password_err" class="field-error"></div>
+        </div>
+        <div style="display:flex;gap:.75rem;">
+          <button class="btn btn-outline" onclick="goBackToStep1()" style="flex:1;">← رجوع</button>
+          <button class="btn btn-primary" id="submit-btn" onclick="submitRegistration()" style="flex:2;">إنشاء الحساب ✓</button>
+        </div>
       </div>
 
-      <div style="display:flex;gap:.75rem;">
-        <button class="btn btn-outline" onclick="goBackToStep1()" style="flex:1;">← رجوع</button>
-        <button class="btn btn-primary" id="submit-btn" onclick="submitRegistration()" style="flex:2;">إنشاء الحساب ✓</button>
+      <!-- Panel: Login -->
+      <div id="panel-login" style="display:none;">
+        <div class="form-group">
+          <label for="login_email">البريد الإلكتروني</label>
+          <input id="login_email" class="form-control" type="email" placeholder="sara@example.com" dir="ltr" autocomplete="email">
+          <div id="login_email_err" class="field-error"></div>
+        </div>
+        <div class="form-group">
+          <label for="login_password">كلمة المرور</label>
+          <div class="password-wrapper">
+            <input id="login_password" class="form-control" type="password" placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="toggle-pw" onclick="togglePassword('login_password')">👁</button>
+          </div>
+          <div id="login_password_err" class="field-error"></div>
+        </div>
+        <div style="display:flex;gap:.75rem;">
+          <button class="btn btn-outline" onclick="goBackToStep1()" style="flex:1;">← رجوع</button>
+          <button class="btn btn-primary" id="login-btn" onclick="doClientLogin()" style="flex:2;">دخول ←</button>
+        </div>
       </div>
 
-      <div class="auth-footer">
-        لديك حساب؟ <a href="/login">تسجيل الدخول</a>
-      </div>
     </div>
 
   </div>
@@ -158,19 +183,30 @@ function goBackToStep1() {
   hideAlert('alert-box');
 }
 
+// ── Tab switcher ─────────────────────────────────────────
+function switchTab(tab) {
+  const isRegister = tab === 'register';
+  document.getElementById('panel-register').style.display = isRegister ? '' : 'none';
+  document.getElementById('panel-login').style.display    = isRegister ? 'none' : '';
+  document.getElementById('tab-register').classList.toggle('active',  isRegister);
+  document.getElementById('tab-login').classList.toggle('active', !isRegister);
+  hideAlert('alert-box');
+}
+
+// ── Register new client ───────────────────────────────────
 async function submitRegistration() {
   if (!foundTenant) return;
   const fullName = document.getElementById('full_name').value.trim();
-  const email    = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
+  const email    = document.getElementById('reg_email').value.trim();
+  const password = document.getElementById('reg_password').value;
   const btn      = document.getElementById('submit-btn');
 
-  clearErrors('full_name', 'email', 'password');
+  clearErrors('full_name', 'reg_email', 'reg_password');
   hideAlert('alert-box');
 
-  if (!fullName) { fieldError('full_name', 'الاسم الكامل مطلوب'); return; }
-  if (!email)    { fieldError('email', 'البريد الإلكتروني مطلوب'); return; }
-  if (password.length < 8) { fieldError('password', 'كلمة المرور يجب أن تكون ٨ أحرف على الأقل'); return; }
+  if (!fullName) { fieldError('full_name',    'الاسم الكامل مطلوب'); return; }
+  if (!email)    { fieldError('reg_email',    'البريد الإلكتروني مطلوب'); return; }
+  if (password.length < 8) { fieldError('reg_password', 'كلمة المرور يجب أن تكون ٨ أحرف على الأقل'); return; }
 
   setLoading(btn, true);
   try {
@@ -186,7 +222,7 @@ async function submitRegistration() {
       return;
     }
 
-    // Auto-login
+    // Auto-login after register
     const loginRes = await API.post('/api/v1/auth/login', {
       tenant_id: foundTenant.id,
       email,
@@ -195,20 +231,64 @@ async function submitRegistration() {
     if (loginRes.ok) {
       const tokens = loginRes.data.data;
       Auth.save(tokens, {
-        full_name: fullName,
+        full_name:   fullName,
         email,
         tenant_id:   foundTenant.id,
         tenant_slug: foundTenant.slug,
         tenant_name: foundTenant.name,
-        role: 'client',
-        role_label: 'عميل / مريض',
+        role:        'client',
+        role_label:  'عميل / مريض',
       });
       Auth.setAccountType('client');
       location.href = '/dashboard/client';
     } else {
       showAlert('alert-box', 'تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول.', 'success');
-      setTimeout(() => location.href = '/login', 2000);
+      setTimeout(() => switchTab('login'), 2000);
     }
+  } catch(e) {
+    showAlert('alert-box', 'خطأ في الاتصال بالخادم.', 'danger');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+// ── Login existing client ─────────────────────────────────
+async function doClientLogin() {
+  if (!foundTenant) return;
+  const email    = document.getElementById('login_email').value.trim();
+  const password = document.getElementById('login_password').value;
+  const btn      = document.getElementById('login-btn');
+
+  clearErrors('login_email', 'login_password');
+  hideAlert('alert-box');
+
+  if (!email)    { fieldError('login_email',    'أدخل البريد الإلكتروني'); return; }
+  if (!password) { fieldError('login_password', 'أدخل كلمة المرور'); return; }
+
+  setLoading(btn, true);
+  try {
+    const loginRes = await API.post('/api/v1/auth/login', {
+      tenant_id: foundTenant.id,
+      email,
+      password,
+    });
+    if (!loginRes.ok) {
+      showAlert('alert-box', 'بيانات الدخول غير صحيحة، يرجى التحقق والمحاولة مجدداً.', 'danger');
+      return;
+    }
+    const tokens = loginRes.data.data;
+    const claims = decodeJWT(tokens.access_token);
+    Auth.save(tokens, {
+      full_name:   claims.full_name || email,
+      email,
+      tenant_id:   foundTenant.id,
+      tenant_slug: foundTenant.slug,
+      tenant_name: foundTenant.name,
+      role:        'client',
+      role_label:  'عميل / مريض',
+    });
+    Auth.setAccountType('client');
+    location.href = '/dashboard/client';
   } catch(e) {
     showAlert('alert-box', 'خطأ في الاتصال بالخادم.', 'danger');
   } finally {

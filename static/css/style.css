@@ -324,6 +324,34 @@ main { flex: 1; }
 .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
 .auth-footer a:hover { text-decoration: underline; }
 
+/* Auth tabs (register / login switcher) */
+.auth-tabs {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+.auth-tab {
+  flex: 1;
+  padding: .65rem 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background .18s, color .18s;
+}
+.auth-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+.auth-tab:not(.active):hover {
+  background: var(--primary-lt);
+  color: var(--primary);
+}
+
 /* ===== Dashboard Shell (Sidebar Layout) ===== */
 .dash-shell {
   display: flex;
