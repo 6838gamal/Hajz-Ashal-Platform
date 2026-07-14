@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}تسجيل العميل — منصة المواعيد{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card" style="max-width:520px;">
+
+    <div class="auth-header">
+      <div class="auth-logo">👤</div>
+      <h1>تسجيل كعميل</h1>
+      <p class="auth-sub">سجّل في منشأتك الصحية واحجز مواعيدك</p>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step-item active" id="step-ind-1">
+        <div class="step-num">١</div>
+        <span>المنشأة</span>
+      </div>
+      <div class="step-connector" id="conn-1"></div>
+      <div class="step-item" id="step-ind-2">
+        <div class="step-num">٢</div>
+        <span>بياناتك</span>
+      </div>
+    </div>
+
+    <div id="alert-box" class="alert"></div>
+
+    <!-- STEP 1: Find tenant by slug -->
+    <div id="step-1">
+      <div class="form-group">
+        <label for="tenant_slug">معرّف المنشأة <span class="hint">— يُعطيك إياه صاحب العمل</span></label>
+        <input id="tenant_slug" class="form-control" type="text"
+               placeholder="مثال: alamal-clinic" dir="ltr"
+               autocomplete="off" oninput="clearTenantFound()">
+        <div id="tenant_slug_err" class="field-error"></div>
+      </div>
+
+      <div class="tenant-found" id="tenant-found-box">
+        <div class="tf-icon">✅</div>
+        <div>
+          <div class="tf-name" id="tf-name"></div>
+          <div class="tf-id" id="tf-id"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-outline btn-full" id="lookup-btn" onclick="lookupTenant()" style="margin-bottom:.75rem;">
+        🔍 البحث عن المنشأة
+      </button>
+      <button class="btn btn-primary btn-full" id="next-btn" onclick="goToStep2()" style="display:none;">
+        التالي ←
+      </button>
+
+      <div class="auth-footer">
+        لديك حساب؟ <a href="/login">تسجيل الدخول</a>
+        &nbsp;·&nbsp;
+        <a href="/register/business">تسجيل كصاحب عمل</a>
+      </div>
+    </div>
+
+    <!-- STEP 2: Client user info -->
+    <div id="step-2" style="display:none;">
+      <div class="alert alert-info show" id="tenant-confirm-box" style="font-size:.85rem;">
+        ستُسجَّل في منشأة: <strong id="confirm-tenant-name"></strong>
+      </div>
+
+      <div class="form-group">
+        <label for="full_name">الاسم الكامل</label>
+        <input id="full_name" class="form-control" type="text" placeholder="سارة أحمد" autocomplete="name">
+        <div id="full_name_err" class="field-error"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني</label>
+        <input id="email" class="form-control" type="email" placeholder="sara@example.com" dir="ltr" autocomplete="email">
+        <div id="email_err" class="field-error"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">كلمة المرور <span class="hint">— ٨ أحرف على الأقل</span></label>
+        <div class="password-wrapper">
+          <input id="password" class="form-control" type="password" placeholder="••••••••" autocomplete="new-password">
+          <button type="button" class="toggle-pw" onclick="togglePassword('password')">👁</button>
+        </div>
+        <div id="password_err" class="field-error"></div>
+      </div>
+
+      <div style="display:flex;gap:.75rem;">
+        <button class="btn btn-outline" onclick="goBackToStep1()" style="flex:1;">← رجوع</button>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitRegistration()" style="flex:2;">إنشاء الحساب ✓</button>
+      </div>
+
+      <div class="auth-footer">
+        لديك حساب؟ <a href="/login">تسجيل الدخول</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let foundTenant = null;
+
+function clearTenantFound() {
+  foundTenant = null;
+  document.getElementById('tenant-found-box').classList.remove('show');
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('lookup-btn').style.display = '';
+  fieldError('tenant_slug', '');
+}
+
+async function lookupTenant() {
+  const slug = document.getElementById('tenant_slug').value.trim();
+  const btn  = document.getElementById('lookup-btn');
+  fieldError('tenant_slug', '');
+  hideAlert('alert-box');
+
+  if (!slug) { fieldError('tenant_slug', 'أدخل معرّف المنشأة'); return; }
+
+  setLoading(btn, true);
+  try {
+    const res = await API.get(`/api/v1/tenants/by-slug/${encodeURIComponent(slug)}`);
+    if (res.ok && res.data?.data) {
+      foundTenant = res.data.data;
+      document.getElementById('tf-name').textContent = foundTenant.name;
+      document.getElementById('tf-id').textContent   = 'المعرّف: ' + foundTenant.slug;
+      document.getElementById('tenant-found-box').classList.add('show');
+      document.getElementById('next-btn').style.display = '';
+      document.getElementById('lookup-btn').style.display = 'none';
+    } else {
+      fieldError('tenant_slug', 'لم يُعثر على منشأة بهذا المعرّف، تأكد من الاسم وحاول مجدداً.');
+    }
+  } catch(e) {
+    showAlert('alert-box', 'خطأ في الاتصال بالخادم.', 'danger');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+function goToStep2() {
+  if (!foundTenant) return;
+  document.getElementById('confirm-tenant-name').textContent = foundTenant.name;
+  document.getElementById('step-1').style.display = 'none';
+  document.getElementById('step-2').style.display = 'block';
+  document.getElementById('step-ind-1').className = 'step-item done';
+  document.getElementById('conn-1').classList.add('done');
+  document.getElementById('step-ind-2').className = 'step-item active';
+}
+
+function goBackToStep1() {
+  document.getElementById('step-1').style.display = 'block';
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-ind-1').className = 'step-item active';
+  document.getElementById('conn-1').classList.remove('done');
+  document.getElementById('step-ind-2').className = 'step-item';
+  hideAlert('alert-box');
+}
+
+async function submitRegistration() {
+  if (!foundTenant) return;
+  const fullName = document.getElementById('full_name').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('submit-btn');
+
+  clearErrors('full_name', 'email', 'password');
+  hideAlert('alert-box');
+
+  if (!fullName) { fieldError('full_name', 'الاسم الكامل مطلوب'); return; }
+  if (!email)    { fieldError('email', 'البريد الإلكتروني مطلوب'); return; }
+  if (password.length < 8) { fieldError('password', 'كلمة المرور يجب أن تكون ٨ أحرف على الأقل'); return; }
+
+  setLoading(btn, true);
+  try {
+    const regRes = await API.post('/api/v1/auth/register', {
+      tenant_id: foundTenant.id,
+      full_name: fullName,
+      email,
+      password,
+    });
+    if (!regRes.ok) {
+      const msg = regRes.data?.error?.message || 'تعذّر إنشاء الحساب';
+      showAlert('alert-box', msg, 'danger');
+      return;
+    }
+
+    // Auto-login
+    const loginRes = await API.post('/api/v1/auth/login', {
+      tenant_id: foundTenant.id,
+      email,
+      password,
+    });
+    if (loginRes.ok) {
+      const tokens = loginRes.data.data;
+      Auth.save(tokens, {
+        full_name: fullName,
+        email,
+        tenant_id: foundTenant.id,
+        tenant_name: foundTenant.name,
+        role: 'client',
+        role_label: 'عميل / مريض',
+      });
+      location.href = '/dashboard';
+    } else {
+      showAlert('alert-box', 'تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول.', 'success');
+      setTimeout(() => location.href = '/login', 2000);
+    }
+  } catch(e) {
+    showAlert('alert-box', 'خطأ في الاتصال بالخادم.', 'danger');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+</script>
+{% endblock %}

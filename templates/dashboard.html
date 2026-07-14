@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}لوحة التحكم — منصة المواعيد{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+  <div class="welcome-banner" id="welcome-banner">
+    <h2 id="welcome-name">مرحباً 👋</h2>
+    <p id="welcome-sub">لوحة التحكم الخاصة بك</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">المواعيد اليوم</div>
+      <div class="stat-val">—</div>
+      <div class="stat-note">قريباً مع موديول المواعيد</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">إجمالي المرضى</div>
+      <div class="stat-val">—</div>
+      <div class="stat-note">قريباً مع موديول المرضى</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">الأطباء النشطون</div>
+      <div class="stat-val">—</div>
+      <div class="stat-note">قريباً مع موديول الأطباء</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">الإيرادات هذا الشهر</div>
+      <div class="stat-val">—</div>
+      <div class="stat-note">قريباً مع موديول الفواتير</div>
+    </div>
+  </div>
+
+  <!-- Account Info -->
+  <div class="grid-2">
+    <div class="info-card">
+      <h3>📋 معلومات الحساب</h3>
+      <div class="info-row">
+        <span class="label">الاسم</span>
+        <span class="value" id="info-name">—</span>
+      </div>
+      <div class="info-row">
+        <span class="label">البريد الإلكتروني</span>
+        <span class="value" id="info-email" dir="ltr">—</span>
+      </div>
+      <div class="info-row">
+        <span class="label">المنشأة</span>
+        <span class="value" id="info-tenant">—</span>
+      </div>
+      <div class="info-row">
+        <span class="label">الدور</span>
+        <span class="value"><span class="badge badge-primary" id="info-role">—</span></span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>⚡ الإجراءات السريعة</h3>
+      <div style="display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem;">
+        <a href="/docs" target="_blank" class="btn btn-outline" style="justify-content:flex-start;gap:.5rem;">
+          📖 واجهة API التفاعلية (Swagger)
+        </a>
+        <button class="btn btn-outline" style="justify-content:flex-start;gap:.5rem;" onclick="copyTenantId()">
+          📋 نسخ معرّف المنشأة (UUID)
+        </button>
+        <button class="btn btn-outline" style="justify-content:flex-start;gap:.5rem;border-color:var(--danger);color:var(--danger);"
+                onclick="Auth.clear();location.href='/'">
+          🚪 تسجيل الخروج
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roles & Permissions -->
+  <div class="info-card" style="margin-top:1.5rem;">
+    <h3>🔐 الأدوار والصلاحيات (من JWT)</h3>
+    <div id="roles-section" style="margin-top:.5rem;">
+      <div id="roles-empty" class="alert alert-info show" style="font-size:.85rem;">
+        لم تُعيَّن لك أدوار بعد. يقوم مدير المنشأة بتعيين الأدوار والصلاحيات عبر واجهة RBAC.
+        <br><br>
+        <strong>ملاحظة:</strong> الأدوار والصلاحيات مُضمَّنة في JWT ويُحدَّث الـ Token عند تعيين أدوار جديدة لك.
+      </div>
+      <div id="roles-list" style="display:none;">
+        <div class="info-row">
+          <span class="label">الأدوار</span>
+          <span class="value" id="roles-val">—</span>
+        </div>
+        <div class="info-row">
+          <span class="label">الصلاحيات</span>
+          <span class="value" id="permissions-val" style="font-size:.82rem;max-width:60%;text-align:left;word-break:break-all;">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+if (!Auth.isLoggedIn()) { location.href = '/login'; }
+
+const info = Auth.getUserInfo() || {};
+const claims = Auth.getAccess() ? decodeJWT(Auth.getAccess()) : {};
+
+// Welcome banner
+document.getElementById('welcome-name').textContent = 'مرحباً، ' + (info.full_name || 'مستخدم') + ' 👋';
+document.getElementById('welcome-sub').textContent  = (info.tenant_name || '') + ' — ' + (info.role_label || 'مستخدم');
+
+// Account info
+document.getElementById('info-name').textContent   = info.full_name  || '—';
+document.getElementById('info-email').textContent  = info.email      || '—';
+document.getElementById('info-tenant').textContent = info.tenant_name || '—';
+document.getElementById('info-role').textContent   = info.role_label  || 'مستخدم';
+
+// Roles from JWT
+const roles       = claims.roles       || info.roles       || [];
+const permissions = claims.permissions || info.permissions || [];
+
+if (roles.length || permissions.length) {
+  document.getElementById('roles-empty').style.display = 'none';
+  document.getElementById('roles-list').style.display  = 'block';
+  document.getElementById('roles-val').textContent       = roles.join('، ')       || 'لا يوجد';
+  document.getElementById('permissions-val').textContent = permissions.join(' · ') || 'لا يوجد';
+}
+
+function copyTenantId() {
+  const id = info.tenant_id || claims.tenant_id;
+  if (!id) return alert('معرّف المنشأة غير متاح');
+  navigator.clipboard.writeText(id).then(() => alert('تم نسخ معرّف المنشأة:\n' + id));
+}
+</script>
+{% endblock %}

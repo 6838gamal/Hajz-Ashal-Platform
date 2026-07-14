@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}تسجيل الدخول — منصة المواعيد{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="auth-logo">🔑</div>
+      <h1>تسجيل الدخول</h1>
+      <p class="auth-sub">أدخل بيانات حسابك للمتابعة</p>
+    </div>
+
+    <div id="alert-box" class="alert"></div>
+
+    <div class="form-group">
+      <label for="tenant_slug">معرّف المنشأة</label>
+      <input id="tenant_slug" class="form-control" type="text"
+             placeholder="alamal-clinic" dir="ltr" autocomplete="organization">
+      <div id="tenant_slug_err" class="field-error"></div>
+      <div class="slug-preview" id="tenant-name-preview" style="display:none;"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">البريد الإلكتروني</label>
+      <input id="email" class="form-control" type="email"
+             placeholder="ahmed@example.com" dir="ltr" autocomplete="email">
+      <div id="email_err" class="field-error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">كلمة المرور</label>
+      <div class="password-wrapper">
+        <input id="password" class="form-control" type="password"
+               placeholder="••••••••" autocomplete="current-password">
+        <button type="button" class="toggle-pw" onclick="togglePassword('password')">👁</button>
+      </div>
+      <div id="password_err" class="field-error"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full" id="login-btn" onclick="doLogin()">
+      تسجيل الدخول
+    </button>
+
+    <div class="divider">أو</div>
+
+    <div style="display:flex;gap:.75rem;">
+      <a href="/register/business" class="btn btn-outline" style="flex:1;text-align:center;">حساب منشأة</a>
+      <a href="/register/client"   class="btn btn-outline" style="flex:1;text-align:center;border-color:var(--accent);color:var(--accent);">حساب عميل</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Redirect if already logged in
+if (Auth.isLoggedIn()) location.href = '/dashboard';
+
+// Lookup tenant name as user types slug (debounced)
+let slugTimer;
+document.getElementById('tenant_slug').addEventListener('input', function() {
+  clearTimeout(slugTimer);
+  const preview = document.getElementById('tenant-name-preview');
+  preview.style.display = 'none';
+  slugTimer = setTimeout(async () => {
+    const slug = this.value.trim();
+    if (!slug) return;
+    const res = await API.get(`/api/v1/tenants/by-slug/${encodeURIComponent(slug)}`);
+    if (res.ok && res.data?.data) {
+      preview.textContent = '✅ ' + res.data.data.name;
+      preview.style.display = 'block';
+      preview.style.color = 'var(--success)';
+    }
+  }, 500);
+});
+
+// Press Enter to login
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const slug     = document.getElementById('tenant_slug').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('login-btn');
+
+  clearErrors('tenant_slug', 'email', 'password');
+  hideAlert('alert-box');
+
+  if (!slug)     { fieldError('tenant_slug', 'أدخل معرّف المنشأة'); return; }
+  if (!email)    { fieldError('email', 'أدخل البريد الإلكتروني'); return; }
+  if (!password) { fieldError('password', 'أدخل كلمة المرور'); return; }
+
+  setLoading(btn, true);
+  try {
+    // Resolve slug → tenant_id
+    const tenantRes = await API.get(`/api/v1/tenants/by-slug/${encodeURIComponent(slug)}`);
+    if (!tenantRes.ok || !tenantRes.data?.data) {
+      fieldError('tenant_slug', 'لم يُعثر على منشأة بهذا المعرّف');
+      return;
+    }
+    const tenant = tenantRes.data.data;
+
+    const loginRes = await API.post('/api/v1/auth/login', {
+      tenant_id: tenant.id,
+      email,
+      password,
+    });
+    if (!loginRes.ok) {
+      showAlert('alert-box', 'بيانات الدخول غير صحيحة، يرجى التحقق والمحاولة مجدداً.', 'danger');
+      return;
+    }
+
+    const tokens  = loginRes.data.data;
+    const claims  = decodeJWT(tokens.access_token);
+    Auth.save(tokens, {
+      full_name:   claims.full_name  || email,
+      email,
+      tenant_id:   tenant.id,
+      tenant_name: tenant.name,
+      roles:       claims.roles       || [],
+      permissions: claims.permissions || [],
+      role_label:  (claims.roles || []).length ? claims.roles.join('، ') : 'مستخدم',
+    });
+    location.href = '/dashboard';
+
+  } catch(e) {
+    showAlert('alert-box', 'خطأ في الاتصال بالخادم.', 'danger');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+</script>
+{% endblock %}

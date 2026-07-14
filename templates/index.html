@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}الرئيسية — منصة المواعيد{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>إدارة المواعيد بذكاء وسهولة</h1>
+    <p>منصة متكاملة لإدارة وحجز المواعيد للعيادات والمنشآت الصحية — ابدأ مجاناً اليوم</p>
+  </div>
+</section>
+
+<!-- User Type Cards -->
+<section class="cards-section">
+  <h2 class="section-title">من أنت؟</h2>
+  <p class="section-sub">اختر نوع حسابك للبدء</p>
+
+  <div class="user-cards">
+
+    <!-- Business Owner -->
+    <a href="/register/business" class="user-card business">
+      <div class="card-icon">🏢</div>
+      <h3>صاحب العمل</h3>
+      <p>
+        سجّل منشأتك (عيادة، مركز طبي، مستشفى...) وأدِر فريقك،
+        مواعيدك، وعملاءك من مكان واحد.
+      </p>
+      <div style="margin-bottom:1rem;">
+        <span class="role-badge">مدير المنشأة</span>
+      </div>
+      <span class="btn btn-primary" style="display:inline-flex;">إنشاء حساب المنشأة ←</span>
+    </a>
+
+    <!-- Client -->
+    <a href="/register/client" class="user-card client">
+      <div class="card-icon">👤</div>
+      <h3>العميل / المريض</h3>
+      <p>
+        سجّل في منشأتك الصحية واحجز مواعيدك بسهولة وتابع
+        سجلاتك الطبية في أي وقت.
+      </p>
+      <div style="margin-bottom:1rem;">
+        <span class="role-badge">عميل / مريض</span>
+      </div>
+      <span class="btn btn-outline" style="display:inline-flex;border-color:var(--accent);color:var(--accent);">إنشاء حساب عميل ←</span>
+    </a>
+
+  </div>
+
+  <!-- Already have account -->
+  <div style="text-align:center;margin-top:2rem;">
+    <span style="color:var(--text-muted);font-size:.9rem;">لديك حساب بالفعل؟ </span>
+    <a href="/login" style="color:var(--primary);font-weight:600;text-decoration:none;">تسجيل الدخول</a>
+  </div>
+</section>
+
+<!-- Features strip -->
+<section style="background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:2.5rem 2rem;">
+  <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;text-align:center;">
+    <div>
+      <div style="font-size:2rem;margin-bottom:.5rem;">📅</div>
+      <h4 style="margin-bottom:.3rem;">حجز ذكي للمواعيد</h4>
+      <p style="color:var(--text-muted);font-size:.88rem;">بدون تعارض، مع قوائم انتظار تلقائية</p>
+    </div>
+    <div>
+      <div style="font-size:2rem;margin-bottom:.5rem;">👥</div>
+      <h4 style="margin-bottom:.3rem;">إدارة الفريق</h4>
+      <p style="color:var(--text-muted);font-size:.88rem;">أطباء، موظفون، صلاحيات مرنة لكل دور</p>
+    </div>
+    <div>
+      <div style="font-size:2rem;margin-bottom:.5rem;">📊</div>
+      <h4 style="margin-bottom:.3rem;">تقارير وتحليلات</h4>
+      <p style="color:var(--text-muted);font-size:.88rem;">KPIs، إيرادات، معدلات الحضور والإلغاء</p>
+    </div>
+    <div>
+      <div style="font-size:2rem;margin-bottom:.5rem;">🔔</div>
+      <h4 style="margin-bottom:.3rem;">إشعارات تلقائية</h4>
+      <p style="color:var(--text-muted);font-size:.88rem;">تذكير بالمواعيد عبر البريد والرسائل</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

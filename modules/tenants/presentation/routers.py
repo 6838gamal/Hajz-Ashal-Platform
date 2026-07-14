@@ -23,6 +23,19 @@ from modules.tenants.presentation.schemas import (
 router = APIRouter(prefix="/api/v1/tenants", tags=["tenants"])
 
 
+@router.get("/by-slug/{slug}", response_model=ApiResponse[TenantSchema])
+async def get_tenant_by_slug(slug: str, session: AsyncSession = Depends(get_session)):
+    """Public endpoint — resolve a tenant slug to its id.
+    Used by the login and client-registration pages."""
+    from modules.tenants.infrastructure.repositories import TenantRepository
+    repo = TenantRepository(session)
+    tenant = await repo.get_by_slug(slug)
+    if tenant is None:
+        from core.application.exceptions import NotFoundException
+        raise NotFoundException(f"Tenant '{slug}' not found.")
+    return ApiResponse.ok(TenantSchema(id=tenant.id, name=tenant.name, slug=tenant.slug, status=tenant.status))
+
+
 @router.post("", response_model=ApiResponse[TenantSchema], status_code=201)
 async def create_tenant(payload: CreateTenantSchema, session: AsyncSession = Depends(get_session)):
     """Public sign-up endpoint - no auth required, this is how a new

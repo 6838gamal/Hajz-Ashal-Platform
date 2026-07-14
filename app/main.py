@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app.database import engine
 from app.module_registry import register_all_modules
 from app.settings import get_settings
+from app.web_routes import router as web_router
 from core.presentation.error_handlers import register_error_handlers
 from core.presentation.middlewares import RequestIdMiddleware, TenantContextMiddleware
 
@@ -26,6 +28,8 @@ app.add_middleware(RequestIdMiddleware)
 
 register_error_handlers(app)
 register_all_modules(app)
+app.include_router(web_router)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/health", tags=["health"])
