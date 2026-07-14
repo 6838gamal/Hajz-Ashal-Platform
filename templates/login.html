@@ -58,6 +58,21 @@
 // Redirect if already logged in
 if (Auth.isLoggedIn()) location.replace(Auth.getDashboardUrl());
 
+// Pre-fill tenant slug from last saved session
+(function prefillSlug() {
+  const info = Auth.getUserInfo();
+  if (!info?.tenant_slug) return;
+  const inp = document.getElementById('tenant_slug');
+  inp.value = info.tenant_slug;
+  // Show the saved tenant name immediately
+  const preview = document.getElementById('tenant-name-preview');
+  if (info.tenant_name) {
+    preview.textContent = '✅ ' + info.tenant_name;
+    preview.style.display = 'block';
+    preview.style.color = 'var(--success)';
+  }
+})();
+
 // Lookup tenant name as user types slug (debounced)
 let slugTimer;
 document.getElementById('tenant_slug').addEventListener('input', function() {

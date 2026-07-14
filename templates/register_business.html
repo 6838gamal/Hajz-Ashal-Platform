@@ -192,9 +192,10 @@ async function submitRegistration() {
     if (loginRes.ok) {
       const tokens = loginRes.data.data;
       Auth.save(tokens, {
-        full_name: fullName,
+        full_name:   fullName,
         email,
-        tenant_id: tenantId,
+        tenant_id:   tenantId,
+        tenant_slug: slug,
         tenant_name: name,
         role: 'business_owner',
         role_label: 'مدير المنشأة',
