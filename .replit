@@ -22,13 +22,13 @@ args = "Start application"
 name = "Start application"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && export PATH=\"$PWD/.pythonlibs/bin:$PATH\" && export PYTHONPATH=\"$PWD\" && uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload"
-waitForPort = 5000
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && export PATH=\"$PWD/.pythonlibs/bin:$PATH\" && export PYTHONPATH=\"$PWD\" && pip install --quiet -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload"
+waitForPort = 5000
 
 [[ports]]
 localPort = 5000
