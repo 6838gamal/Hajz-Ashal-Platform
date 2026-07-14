@@ -52,9 +52,16 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     import os
 
+    # EXTERNAL_DATABASE_URL (Render Postgres) is the single source of truth
+    # for the database connection, per explicit user decision. It takes
+    # priority over Replit's runtime-managed DATABASE_URL.
+    database_url = os.environ.get("EXTERNAL_DATABASE_URL") or os.environ.get(
+        "DATABASE_URL", "postgresql://postgres:password@localhost/app"
+    )
+
     return Settings(
         environment=os.environ.get("ENVIRONMENT", "development"),
-        database_url=os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost/app"),
+        database_url=database_url,
         jwt_secret=os.environ.get("JWT_SECRET", os.environ.get("SESSION_SECRET", "dev-only-insecure-secret-change-me")),
         jwt_access_ttl_minutes=int(os.environ.get("JWT_ACCESS_TTL_MINUTES", "15")),
         jwt_refresh_ttl_days=int(os.environ.get("JWT_REFRESH_TTL_DAYS", "30")),

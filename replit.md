@@ -29,7 +29,7 @@ Python, FastAPI, PostgreSQL, Docker فقط. ممنوع: Redis, Celery, RabbitMQ,
 **كيفية التشغيل:**
 - Workflow: `Start application` يشغّل `uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload`.
 - التوثيق التفاعلي: `/docs` (Swagger)، `/health` و `/health/ready` لفحوصات الصحة.
-- قاعدة البيانات: PostgreSQL المدارة من Replit (`DATABASE_URL` تلقائياً)، عبر SQLAlchemy async + asyncpg.
+- قاعدة البيانات: **Render Postgres خارجية** (وليست قاعدة Replit المدمجة) — الاتصال عبر السر `EXTERNAL_DATABASE_URL` (له الأولوية دائماً على `DATABASE_URL`)، عبر SQLAlchemy async + asyncpg. هذا قرار صريح من المستخدم؛ لا تُرجع الاتصال إلى قاعدة Replit المدمجة دون طلب واضح.
 - Migrations: `alembic upgrade head` (بعد `export PYTHONPATH="$PWD"`). لإنشاء migration جديدة بعد تعديل أي ORM model: `alembic revision --autogenerate -m "..."`.
 - تعبئة كتالوج الصلاحيات: `python scripts/seed_permissions.py`.
 - `JWT_SECRET`: يُقرأ من متغير البيئة `JWT_SECRET`، وإن لم يوجد يُستخدم `SESSION_SECRET` كبديل احتياطي فقط في التطوير.
