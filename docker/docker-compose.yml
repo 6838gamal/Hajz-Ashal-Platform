@@ -1,0 +1,33 @@
+# Local/off-Replit development only. On Replit itself, use the built-in
+# PostgreSQL database + a workflow instead of Docker Compose (see
+# docs/architecture/06-folder-structure-and-deployment.md section 6.5).
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://app:${DB_PASSWORD:-app}@db:5432/app
+      JWT_SECRET: ${JWT_SECRET:-dev-only-insecure-secret-change-me}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-app}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
