@@ -202,7 +202,8 @@ async function submitRegistration() {
         role: 'client',
         role_label: 'عميل / مريض',
       });
-      location.href = '/dashboard';
+      Auth.setAccountType('client');
+      location.href = '/dashboard/client';
     } else {
       showAlert('alert-box', 'تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول.', 'success');
       setTimeout(() => location.href = '/login', 2000);

@@ -20,9 +20,19 @@ const Auth = {
     localStorage.setItem('refresh_token', tokens.refresh_token);
     if (info) localStorage.setItem('user_info', JSON.stringify(info));
   },
-  getAccess()  { return localStorage.getItem('access_token'); },
-  getUserInfo(){ return JSON.parse(localStorage.getItem('user_info') || 'null'); },
-  clear() { localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); localStorage.removeItem('user_info'); },
+  getAccess()       { return localStorage.getItem('access_token'); },
+  getUserInfo()     { return JSON.parse(localStorage.getItem('user_info') || 'null'); },
+  getAccountType()  { return localStorage.getItem('account_type'); },          // 'business' | 'client'
+  setAccountType(t) { localStorage.setItem('account_type', t); },
+  getDashboardUrl() {
+    return localStorage.getItem('account_type') === 'business'
+      ? '/dashboard/admin'
+      : '/dashboard/client';
+  },
+  clear() {
+    ['access_token', 'refresh_token', 'user_info', 'account_type']
+      .forEach(k => localStorage.removeItem(k));
+  },
   isLoggedIn() { return !!localStorage.getItem('access_token'); },
 };
 

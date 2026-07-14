@@ -33,6 +33,9 @@
   </div>
 </header>
 
+<!-- Backdrop (mobile overlay) -->
+<div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
 <!-- ===== SHELL ===== -->
 <div class="dash-shell">
 
@@ -358,11 +361,50 @@ document.getElementById('topbar-date').textContent =
   now.toLocaleDateString('ar-SA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
 /* ---- Sidebar toggle ---- */
-function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  sb.style.width = sb.style.width === '0px' ? '260px' : '0px';
-  sb.style.overflow = sb.style.width === '0px' ? 'hidden' : '';
+const _sb       = document.getElementById('sidebar');
+const _backdrop = document.getElementById('sidebar-backdrop');
+
+function _isMobile() { return window.innerWidth < 1024; }
+
+function openSidebar() {
+  if (_isMobile()) {
+    _sb.classList.add('sidebar--open');
+    _backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  } else {
+    _sb.classList.remove('sidebar--collapsed');
+  }
 }
+function closeSidebar() {
+  _sb.classList.remove('sidebar--open');
+  _backdrop.classList.remove('active');
+  document.body.style.overflow = '';
+}
+function toggleSidebar() {
+  if (_isMobile()) {
+    _sb.classList.contains('sidebar--open') ? closeSidebar() : openSidebar();
+  } else {
+    _sb.classList.toggle('sidebar--collapsed');
+  }
+}
+
+_backdrop.addEventListener('click', closeSidebar);
+
+// Auto-close sidebar on mobile after navigating
+document.querySelectorAll('.sidebar-item').forEach(function(item) {
+  item.addEventListener('click', function() {
+    if (_isMobile()) closeSidebar();
+  });
+});
+
+// On resize to desktop: reset mobile state
+window.addEventListener('resize', function() {
+  if (!_isMobile()) {
+    _sb.classList.remove('sidebar--open');
+    _backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+});
 
 /* ---- Page routing ---- */
 const pageLabels = {

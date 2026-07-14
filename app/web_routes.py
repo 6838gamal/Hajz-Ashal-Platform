@@ -36,6 +36,16 @@ async def dashboard(request: Request):
     return templates.TemplateResponse(request=request, name="dashboard.html")
 
 
+@router.get("/dashboard/admin", response_class=HTMLResponse)
+async def dashboard_admin(request: Request):
+    return templates.TemplateResponse(request=request, name="dashboard_admin.html")
+
+
+@router.get("/dashboard/client", response_class=HTMLResponse)
+async def dashboard_client(request: Request):
+    return templates.TemplateResponse(request=request, name="dashboard_client.html")
+
+
 @router.get("/register", response_class=RedirectResponse)
 async def register_redirect():
     return RedirectResponse(url="/")

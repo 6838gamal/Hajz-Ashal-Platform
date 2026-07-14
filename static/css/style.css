@@ -343,8 +343,14 @@ main { flex: 1; }
   height: calc(100vh - 61px);
   overflow-y: auto;
   overflow-x: hidden;
-  transition: width .25s;
+  transition: width .28s cubic-bezier(.4,0,.2,1);
   z-index: 50;
+}
+
+/* Desktop: collapse sidebar to zero */
+.sidebar.sidebar--collapsed {
+  width: 0;
+  overflow: hidden;
 }
 
 .sidebar::-webkit-scrollbar { width: 4px; }
@@ -564,3 +570,65 @@ main { flex: 1; }
 .tenant-found .tf-icon { font-size: 1.4rem; }
 .tenant-found .tf-name { font-weight: 700; color: var(--primary-dk); }
 .tenant-found .tf-id   { font-size: .75rem; color: var(--text-muted); }
+
+/* ===== Sidebar Backdrop (mobile overlay) ===== */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .52);
+  z-index: 250;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sidebar-backdrop.active { display: block; }
+
+/* ===== Responsive Dashboard ===== */
+
+/* ── Tablet & Mobile (<1024px): sidebar becomes a fixed overlay ── */
+@media (max-width: 1023px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;        /* RTL: slide in from the right */
+    height: 100dvh;
+    width: min(285px, 88vw);
+    transform: translateX(105%);
+    transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+    z-index: 300;
+    /* reset desktop-only overrides */
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .sidebar.sidebar--open {
+    transform: translateX(0);
+  }
+  /* sidebar--collapsed is irrelevant on mobile; reset it */
+  .sidebar.sidebar--collapsed {
+    width: min(285px, 88vw);
+    overflow: hidden;
+    transform: translateX(105%);
+  }
+  /* main content takes full width, not affected by sidebar */
+  .dash-shell { display: block; }
+  .dash-main  { width: 100%; }
+}
+
+/* ── Mobile (<768px) ── */
+@media (max-width: 767px) {
+  .dash-body   { padding: 1.1rem 1rem; }
+  .dash-topbar { padding: .65rem 1rem; }
+  .dash-topbar h1 { font-size: .95rem; }
+  .stats-grid  { grid-template-columns: 1fr 1fr; }
+  .welcome-banner { padding: 1.25rem 1rem; }
+  .welcome-banner h2 { font-size: 1.2rem; }
+  .info-card   { padding: 1.25rem 1rem; }
+  .grid-2      { grid-template-columns: 1fr; }
+}
+
+/* ── Small Mobile (<480px) ── */
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .dash-topbar h1 { font-size: .88rem; }
+  .welcome-banner h2 { font-size: 1.05rem; }
+}

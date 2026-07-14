@@ -199,7 +199,8 @@ async function submitRegistration() {
         role: 'business_owner',
         role_label: 'مدير المنشأة',
       });
-      location.href = '/dashboard';
+      Auth.setAccountType('business');
+      location.href = '/dashboard/admin';
     } else {
       showAlert('alert-box', 'تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول.', 'success');
       setTimeout(() => location.href = '/login', 2000);
