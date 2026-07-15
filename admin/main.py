@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from sqlalchemy import text
 
 from app.database import engine
@@ -43,6 +44,11 @@ app.add_middleware(RequestIdMiddleware)
 
 register_error_handlers(app)
 register_platform_admin(app)
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse(url="/admin/login")
 
 
 @app.get("/health", tags=["health"])
