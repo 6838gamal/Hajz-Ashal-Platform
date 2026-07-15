@@ -6,7 +6,7 @@ services:
     dockerfilePath: ./docker/Dockerfile
     dockerContext: .
     startCommand: >-
-      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+      sh -c "uv run alembic upgrade head && uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: EXTERNAL_DATABASE_URL
         fromDatabase:
@@ -26,7 +26,7 @@ services:
     dockerfilePath: ./docker/Dockerfile
     dockerContext: .
     startCommand: >-
-      sh -c "uvicorn admin.main:app --host 0.0.0.0 --port $PORT"
+      sh -c "uv run uvicorn admin.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: EXTERNAL_DATABASE_URL
         fromDatabase:
