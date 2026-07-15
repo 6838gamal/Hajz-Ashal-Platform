@@ -27,7 +27,7 @@ from app.database import engine
 from app.settings import get_settings
 from core.presentation.error_handlers import register_error_handlers
 from core.presentation.middlewares import RequestIdMiddleware
-from modules.platform_admin.module import register as register_platform_admin
+from admin.platform_admin.module import register as register_platform_admin
 
 settings = get_settings()
 

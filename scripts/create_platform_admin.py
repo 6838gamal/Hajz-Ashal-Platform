@@ -19,7 +19,7 @@ from sqlalchemy import select
 
 from app.database import AsyncSessionLocal
 from core.infrastructure.security import hash_password
-from modules.platform_admin.infrastructure.models import PlatformAdminModel
+from admin.platform_admin.infrastructure.models import PlatformAdminModel
 
 
 async def _create_or_update(email: str, password: str | None, full_name: str) -> str:

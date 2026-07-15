@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.domain.result import Error, Result
 from core.infrastructure.security import create_access_token, verify_password
-from modules.platform_admin.application.dtos import PlatformLoginRequest, PlatformTokenResponse
-from modules.platform_admin.infrastructure.repositories import PlatformAdminRepository
+from admin.platform_admin.application.dtos import PlatformLoginRequest, PlatformTokenResponse
+from admin.platform_admin.infrastructure.repositories import PlatformAdminRepository
 
 
 class PlatformAdminLogin:

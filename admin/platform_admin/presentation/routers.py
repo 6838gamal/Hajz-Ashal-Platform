@@ -11,11 +11,11 @@ from core.application.exceptions import ConflictException, NotFoundException, Un
 from core.presentation.responses import ApiMeta, ApiResponse
 from modules.access_control.application import public_api as access_control_api
 from modules.identity.application import public_api as identity_api
-from modules.platform_admin.application.dtos import PlatformLoginRequest
-from modules.platform_admin.application.use_cases.login import PlatformAdminLogin
-from modules.platform_admin.infrastructure.repositories import PlatformAdminRepository
-from modules.platform_admin.presentation.dependencies import get_current_platform_admin
-from modules.platform_admin.presentation.schemas import (
+from admin.platform_admin.application.dtos import PlatformLoginRequest
+from admin.platform_admin.application.use_cases.login import PlatformAdminLogin
+from admin.platform_admin.infrastructure.repositories import PlatformAdminRepository
+from admin.platform_admin.presentation.dependencies import get_current_platform_admin
+from admin.platform_admin.presentation.schemas import (
     AssignRoleSchema,
     BranchAdminSchema,
     BranchCreateSchema,

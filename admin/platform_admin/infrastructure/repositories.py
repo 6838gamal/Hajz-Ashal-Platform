@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy import select
 
 from core.infrastructure.base_repository import BaseRepository
-from modules.platform_admin.infrastructure.models import PlatformAdminModel
+from admin.platform_admin.infrastructure.models import PlatformAdminModel
 
 
 class PlatformAdminRepository(BaseRepository[PlatformAdminModel]):
