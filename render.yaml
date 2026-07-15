@@ -25,6 +25,8 @@ services:
     runtime: docker
     dockerfilePath: ./docker/Dockerfile.admin
     dockerContext: .
+    startCommand: >-
+      sh -c "uv run uvicorn admin.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: EXTERNAL_DATABASE_URL
         fromDatabase:
