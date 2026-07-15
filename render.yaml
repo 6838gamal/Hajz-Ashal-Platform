@@ -1,0 +1,46 @@
+services:
+  # ── التطبيق الرئيسي (واجهة المنشآت) ─────────────────────────────────────
+  - type: web
+    name: hajz-ashal-app
+    runtime: docker
+    dockerfilePath: ./docker/Dockerfile
+    dockerContext: .
+    startCommand: >-
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: EXTERNAL_DATABASE_URL
+        fromDatabase:
+          name: hajz-ashal-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: "*"
+
+  # ── لوحة تحكم المنصة (Admin Panel) ──────────────────────────────────────
+  - type: web
+    name: hajz-ashal-admin
+    runtime: docker
+    dockerfilePath: ./docker/Dockerfile
+    dockerContext: .
+    startCommand: >-
+      sh -c "uvicorn admin.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: EXTERNAL_DATABASE_URL
+        fromDatabase:
+          name: hajz-ashal-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false          # أدخله يدوياً — يجب أن يطابق قيمة الخدمة الرئيسية
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: "*"
+
+databases:
+  - name: hajz-ashal-db
+    databaseName: hajz_ashal
+    user: hajz_ashal
+    plan: free
