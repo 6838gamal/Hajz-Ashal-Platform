@@ -46,3 +46,9 @@ Python, FastAPI, PostgreSQL, Docker فقط. ممنوع: Redis, Celery, RabbitMQ,
 - تم التحقق يدويًا: إنشاء Tenant → تسجيل مستخدم → تسجيل دخول → فشل بدون صلاحية (403) → نجاح بعد منح الصلاحية (201) → رفض إعادة استخدام Refresh Token القديم (401).
 
 **الخطوة التالية:** باقي الموديولات حسب الترتيب في `01-analysis-and-domains.md` (clinics/doctors/patients/medical_services/rooms، ثم appointments كمحرك المواعيد، ثم billing/subscriptions/dashboard/reporting).
+
+## لوحة تحكم مالك المنصة (Platform Admin)
+موديول `modules/platform_admin` منفصل بالكامل عن حسابات المنشآت، بواجهة مستقلة تحت `/admin/login` و `/admin` (قوالب/أصول في `admin/templates` و `admin/static`). يدير: المنشآت (تعديل/حذف)، الفروع، المستخدمون عبر كل المنشآت، والأدوار/الصلاحيات العامة. تفاصيل القرار الكامل في `admin/decisions.md`.
+
+- إنشاء/تصفير حساب مالك المنصة: `python scripts/create_platform_admin.py --email you@example.com --name "..."` (كلمة المرور تُولَّد عشوائياً وتُطبع مرة واحدة إن لم تُمرَّر).
+- الرمز الخاص بهذه الجلسة يحمل `scope: "platform_admin"` في الـ JWT — مختلف تماماً عن رموز حسابات المنشآت (`scope: "tenant"`).

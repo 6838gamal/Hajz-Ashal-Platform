@@ -60,3 +60,13 @@
 
 الاتجاه المسموح فقط: قطاع ← Platform Modules ← Core.
 العكس ممنوع تماماً.
+
+---
+
+## لوحة تحكم مالك المنصة (Platform Admin)
+
+**القرار:** موديول `modules/platform_admin` منفصل تماماً عن حسابات المنشآت (`identity`)، بجدول `platform_admins` خاص به ولا `tenant_id` عليه.
+- تسجيل الدخول عبر `POST /api/v1/platform-admin/auth/login` يُصدر Access Token يحمل `scope: "platform_admin"` (مقابل `"tenant"` الافتراضي في كل الرموز الأخرى) — أي Dependency يجب أن يتحقق من هذا الحقل صريحاً قبل الوثوق بالصلاحيات.
+- الاستعلامات الخاصة بهذه اللوحة (في `public_api.py` لكل من `tenants`, `identity`, `access_control`) متعمَّدة عدم الالتزام بـ `TenantContext` — لأنها بالتعريف عابرة للمنشآت. هذا الاستثناء الوحيد المسموح به عن قاعدة "لا استعلام بدون tenant scope".
+- الواجهة (`admin/templates`, `admin/static`) منفصلة فعلياً عن `templates/` و`static/` الخاصة بالموقع، وتُخزَّن جلستها في `localStorage` بمفاتيح مسبوقة بـ `pa_` لتجنب التعارض مع جلسة تسجيل دخول المنشأة في نفس المتصفح.
+- التوثيق الكامل والتشغيل: انظر `README.md`.

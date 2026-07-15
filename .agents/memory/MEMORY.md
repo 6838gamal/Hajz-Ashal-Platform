@@ -1,2 +1,3 @@
 - [Replit Postgres + asyncpg](replit-postgres-asyncpg.md) — strip `sslmode=` from DATABASE_URL before using asyncpg; it doesn't accept that kwarg.
 - [Nullable column in a composite PK](nullable-column-composite-pk.md) — Postgres forbids NULL in PK columns; use a surrogate id + unique constraint instead.
+- [Platform-admin JWT scope convention](platform-admin-scope.md) — cross-tenant admin sessions use a `scope` claim; dependencies must check it explicitly, never assume.
