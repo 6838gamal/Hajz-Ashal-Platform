@@ -10,7 +10,7 @@ from modules.identity.module import register as register_identity
 from modules.tenants.module import register as register_tenants
 
 # NOTE: platform_admin is intentionally NOT registered here. It runs as its
-# own standalone FastAPI app (see admin_app/main.py) so it can be deployed
+# own standalone FastAPI app (see admin/main.py) so it can be deployed
 # to a separate server, independent from this tenant-facing app.
 _REGISTERED_MODULES = [
     register_access_control,  # no dependencies

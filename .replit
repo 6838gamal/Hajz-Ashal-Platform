@@ -38,13 +38,13 @@ waitForPort = 5000
 name = "Admin Panel"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && export PATH=\"$PWD/.pythonlibs/bin:$PATH\" && export PYTHONPATH=\"$PWD\" && uvicorn admin_app.main:app --host 0.0.0.0 --port 8000 --reload"
-waitForPort = 8000
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && export PATH=\"$PWD/.pythonlibs/bin:$PATH\" && export PYTHONPATH=\"$PWD\" && pip install --quiet -r requirements.txt && uvicorn admin.main:app --host 0.0.0.0 --port 8000 --reload"
+waitForPort = 8000
 
 [[ports]]
 localPort = 5000

@@ -8,10 +8,10 @@ process, so it can be started, restarted, and deployed to its own server
 completely separately from the main booking app.
 
 Run locally:
-    uvicorn admin_app.main:app --host 0.0.0.0 --port 8000 --reload
+    uvicorn admin.main:app --host 0.0.0.0 --port 8000 --reload
 
 Deploy separately: point a dedicated deployment/server at this module
-(`admin_app.main:app`) with its own `DATABASE_URL`/`EXTERNAL_DATABASE_URL`,
+(`admin.main:app`) with its own `DATABASE_URL`/`EXTERNAL_DATABASE_URL`,
 `JWT_SECRET`, and `PLATFORM_ADMIN_TOKEN_TTL_MINUTES` env vars set to the same
 values as the main app (they must share the JWT secret and the database to
 work correctly, but nothing else is required from the main app's process).
