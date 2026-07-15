@@ -1,0 +1,131 @@
+/* Platform-admin specific styles. Reuses the CSS variables and base classes
+   (.btn, .form-control, .sidebar, .dash-shell, .auth-card ...) already
+   defined in /static/css/style.css - this file only adds what that
+   stylesheet doesn't have (data tables, modals, tabs, badges). */
+
+.pa-topbar {
+  background: #0d1f2d;
+  color: #c8d6e0;
+}
+
+.pa-badge {
+  display: inline-block;
+  padding: .18rem .6rem;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+}
+.pa-badge--active   { background: #e6f4ea; color: var(--success); }
+.pa-badge--trial    { background: #fff4e0; color: #b57500; }
+.pa-badge--suspended,
+.pa-badge--disabled  { background: #fde8ea; color: var(--danger); }
+
+.pa-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.pa-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.pa-panel-head h2 { font-size: 1.05rem; font-weight: 700; }
+
+.pa-toolbar { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+.pa-toolbar .form-control { min-width: 220px; margin: 0; }
+
+.pa-table-wrap { overflow-x: auto; }
+
+.pa-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.pa-table th, .pa-table td {
+  padding: .75rem 1.4rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.pa-table th {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: .78rem;
+  text-transform: uppercase;
+  background: #fafbfc;
+}
+.pa-table tbody tr:hover { background: var(--primary-lt); }
+.pa-table .pa-actions { display: flex; gap: .4rem; justify-content: flex-end; }
+
+.pa-empty { padding: 3rem 1rem; text-align: center; color: var(--text-muted); }
+
+.pa-btn-sm { padding: .32rem .75rem; font-size: .8rem; border-radius: 8px; }
+.pa-btn-icon {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: .9rem;
+}
+.pa-btn-icon:hover { background: var(--primary-lt); }
+.pa-btn-icon.danger:hover { background: #fde8ea; border-color: var(--danger); }
+
+.pa-tabs { display: flex; gap: .3rem; flex-wrap: wrap; }
+.pa-tab {
+  padding: .5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: .88rem;
+  font-weight: 600;
+}
+.pa-tab.active { background: var(--primary); color: #fff; }
+
+.pa-page { display: none; }
+.pa-page.active { display: block; }
+
+.pa-chip-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+.pa-chip {
+  display: flex; align-items: center; gap: .35rem;
+  background: var(--primary-lt); color: var(--primary-dk);
+  border-radius: 20px; padding: .3rem .75rem; font-size: .82rem;
+}
+
+/* ===== Modal ===== */
+.pa-modal-backdrop {
+  position: fixed; inset: 0; background: rgba(10, 20, 30, .5);
+  display: none; align-items: center; justify-content: center;
+  z-index: 500; padding: 1rem;
+}
+.pa-modal-backdrop.open { display: flex; }
+.pa-modal {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 100%; max-width: 480px;
+  max-height: 90vh; overflow-y: auto;
+  padding: 1.5rem;
+}
+.pa-modal h3 { font-size: 1.05rem; margin-bottom: 1.1rem; }
+.pa-modal .pa-modal-actions {
+  display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1.3rem;
+}
+.pa-checkbox-list {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .4rem .8rem;
+  max-height: 220px; overflow-y: auto;
+  border: 1px solid var(--border); border-radius: 8px; padding: .7rem .9rem;
+}
+.pa-checkbox-list label {
+  display: flex; align-items: center; gap: .4rem;
+  font-size: .82rem; color: var(--text); font-weight: 400;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .pa-checkbox-list { grid-template-columns: 1fr; }
+  .pa-table th, .pa-table td { padding: .6rem .9rem; }
+}

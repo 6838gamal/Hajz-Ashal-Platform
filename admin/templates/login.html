@@ -1,0 +1,75 @@
+{% extends "base_admin.html" %}
+{% block title %}تسجيل دخول مالك المنصة — حجز أسهل{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="auth-logo">🛠️</div>
+      <h1>لوحة تحكم المنصة</h1>
+      <p class="auth-sub">دخول خاص بمالك المنصة — منفصل عن حسابات المنشآت</p>
+    </div>
+
+    <div id="alert-box" class="alert"></div>
+
+    <div class="form-group">
+      <label for="email">البريد الإلكتروني</label>
+      <input id="email" class="form-control" type="email"
+             placeholder="owner@example.com" dir="ltr" autocomplete="email">
+      <div id="email_err" class="field-error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">كلمة المرور</label>
+      <div class="password-wrapper">
+        <input id="password" class="form-control" type="password"
+               placeholder="••••••••" autocomplete="current-password">
+        <button type="button" class="toggle-pw" onclick="(function(){const i=document.getElementById('password'); i.type = i.type==='password'?'text':'password';})()">👁</button>
+      </div>
+      <div id="password_err" class="field-error"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full" id="login-btn" onclick="paDoLogin()">
+      تسجيل الدخول
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+if (PAAuth.isLoggedIn()) location.replace('/admin');
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') paDoLogin(); });
+
+async function paDoLogin() {
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('login-btn');
+
+  document.getElementById('email_err').textContent = '';
+  document.getElementById('password_err').textContent = '';
+  paHideAlert('alert-box');
+
+  if (!email)    { document.getElementById('email_err').textContent = 'أدخل البريد الإلكتروني'; return; }
+  if (!password) { document.getElementById('password_err').textContent = 'أدخل كلمة المرور'; return; }
+
+  paSetLoading(btn, true);
+  try {
+    const res = await PA_API.post('/api/v1/platform-admin/auth/login', { email, password });
+    if (!res.ok) {
+      paShowAlert('alert-box', res.data?.error?.message || 'بيانات الدخول غير صحيحة.', 'danger');
+      return;
+    }
+    const tokens = res.data.data;
+    PAAuth.save(tokens.access_token, { full_name: tokens.full_name, email: tokens.email });
+    location.href = '/admin';
+  } catch (e) {
+    paShowAlert('alert-box', 'خطأ في الاتصال بالخادم.', 'danger');
+  } finally {
+    paSetLoading(btn, false);
+  }
+}
+</script>
+{% endblock %}

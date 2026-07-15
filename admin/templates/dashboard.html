@@ -1,0 +1,201 @@
+{% extends "base_admin.html" %}
+{% block title %}لوحة تحكم المنصة — حجز أسهل{% endblock %}
+
+{% block head %}
+<style>
+  footer { display: none; }
+  body   { background: var(--bg); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<header class="pa-topbar" style="padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.3);">
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <span style="font-size:1.2rem;">🛠️</span>
+    <span style="font-weight:800;color:#e8f4f8;font-size:1rem;">لوحة تحكم المنصة</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:.9rem;">
+    <span id="pa-admin-name" style="font-size:.85rem;color:#c8d6e0;"></span>
+    <a href="#" onclick="PAAuth.clear();location.href='/admin/login';return false;" style="color:#ef8ea0;font-size:.85rem;text-decoration:none;">تسجيل الخروج</a>
+  </div>
+</header>
+
+<div style="max-width:1200px;margin:0 auto;padding:1.75rem 1.5rem;">
+
+  <div class="pa-tabs" style="margin-bottom:1.25rem;">
+    <div class="pa-tab active" data-page="tenants" onclick="paSwitchPage('tenants')">🏢 المنشآت</div>
+    <div class="pa-tab" data-page="users" onclick="paSwitchPage('users')">👤 المستخدمون</div>
+    <div class="pa-tab" data-page="roles" onclick="paSwitchPage('roles')">🔐 الأدوار والصلاحيات</div>
+  </div>
+
+  <div id="alert-box" class="alert" style="margin-bottom:1rem;"></div>
+
+  <!-- ===== TENANTS ===== -->
+  <div class="pa-page active" id="page-tenants">
+    <div class="pa-panel">
+      <div class="pa-panel-head">
+        <h2>المنشآت (Tenants)</h2>
+        <div class="pa-toolbar">
+          <input class="form-control" id="tenants-search" placeholder="بحث بالاسم أو المعرّف..." oninput="paDebounce(loadTenants)">
+        </div>
+      </div>
+      <div class="pa-table-wrap">
+        <table class="pa-table">
+          <thead><tr><th>الاسم</th><th>المعرّف</th><th>الحالة</th><th></th></tr></thead>
+          <tbody id="tenants-tbody"></tbody>
+        </table>
+        <div class="pa-empty" id="tenants-empty" style="display:none;">لا توجد منشآت مطابقة.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TENANT BRANCHES ===== -->
+  <div class="pa-page" id="page-branches">
+    <button class="btn btn-outline pa-btn-sm" style="margin-bottom:1rem;" onclick="paSwitchPage('tenants')">← رجوع للمنشآت</button>
+    <div class="pa-panel">
+      <div class="pa-panel-head">
+        <h2>فروع: <span id="branches-tenant-name"></span></h2>
+        <button class="btn btn-primary pa-btn-sm" onclick="openBranchModal()">+ فرع جديد</button>
+      </div>
+      <div class="pa-table-wrap">
+        <table class="pa-table">
+          <thead><tr><th>الاسم</th><th>العنوان</th><th>المنطقة الزمنية</th><th></th></tr></thead>
+          <tbody id="branches-tbody"></tbody>
+        </table>
+        <div class="pa-empty" id="branches-empty" style="display:none;">لا توجد فروع لهذه المنشأة بعد.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== USERS ===== -->
+  <div class="pa-page" id="page-users">
+    <div class="pa-panel">
+      <div class="pa-panel-head">
+        <h2>المستخدمون</h2>
+        <div class="pa-toolbar">
+          <input class="form-control" id="users-search" placeholder="بحث بالبريد أو الاسم..." oninput="paDebounce(loadUsers)">
+          <button class="btn btn-primary pa-btn-sm" onclick="openUserModal()">+ مستخدم جديد</button>
+        </div>
+      </div>
+      <div class="pa-table-wrap">
+        <table class="pa-table">
+          <thead><tr><th>الاسم</th><th>البريد الإلكتروني</th><th>الحالة</th><th></th></tr></thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+        <div class="pa-empty" id="users-empty" style="display:none;">لا يوجد مستخدمون مطابقون.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ROLES ===== -->
+  <div class="pa-page" id="page-roles">
+    <div class="pa-panel">
+      <div class="pa-panel-head">
+        <h2>الأدوار والصلاحيات (نطاق عام)</h2>
+        <button class="btn btn-primary pa-btn-sm" onclick="openRoleModal()">+ دور جديد</button>
+      </div>
+      <div class="pa-table-wrap">
+        <table class="pa-table">
+          <thead><tr><th>اسم الدور</th><th>الصلاحيات</th><th></th></tr></thead>
+          <tbody id="roles-tbody"></tbody>
+        </table>
+        <div class="pa-empty" id="roles-empty" style="display:none;">لا توجد أدوار عامة بعد.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== MODAL: Tenant edit ===== -->
+<div class="pa-modal-backdrop" id="modal-tenant">
+  <div class="pa-modal">
+    <h3>تعديل المنشأة</h3>
+    <input type="hidden" id="tenant-edit-id">
+    <div class="form-group"><label>الاسم</label><input class="form-control" id="tenant-edit-name"></div>
+    <div class="form-group">
+      <label>الحالة</label>
+      <select class="form-control" id="tenant-edit-status">
+        <option value="trial">تجربة (trial)</option>
+        <option value="active">فعّالة (active)</option>
+        <option value="suspended">موقوفة (suspended)</option>
+      </select>
+    </div>
+    <div class="pa-modal-actions">
+      <button class="btn btn-outline" onclick="paCloseModal('modal-tenant')">إلغاء</button>
+      <button class="btn btn-primary" id="tenant-save-btn" onclick="saveTenant()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Branch create/edit ===== -->
+<div class="pa-modal-backdrop" id="modal-branch">
+  <div class="pa-modal">
+    <h3 id="branch-modal-title">فرع جديد</h3>
+    <input type="hidden" id="branch-edit-id">
+    <div class="form-group"><label>الاسم</label><input class="form-control" id="branch-edit-name"></div>
+    <div class="form-group"><label>العنوان</label><input class="form-control" id="branch-edit-address"></div>
+    <div class="form-group"><label>المنطقة الزمنية</label><input class="form-control" id="branch-edit-timezone" placeholder="Asia/Riyadh"></div>
+    <div class="pa-modal-actions">
+      <button class="btn btn-outline" onclick="paCloseModal('modal-branch')">إلغاء</button>
+      <button class="btn btn-primary" id="branch-save-btn" onclick="saveBranch()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: User create/edit ===== -->
+<div class="pa-modal-backdrop" id="modal-user">
+  <div class="pa-modal">
+    <h3 id="user-modal-title">مستخدم جديد</h3>
+    <input type="hidden" id="user-edit-id">
+    <div class="form-group" id="user-tenant-group">
+      <label>المنشأة</label>
+      <select class="form-control" id="user-edit-tenant"></select>
+    </div>
+    <div class="form-group"><label>الاسم الكامل</label><input class="form-control" id="user-edit-name"></div>
+    <div class="form-group" id="user-email-group"><label>البريد الإلكتروني</label><input class="form-control" id="user-edit-email" dir="ltr"></div>
+    <div class="form-group">
+      <label>كلمة المرور <span class="hint" id="user-password-hint"></span></label>
+      <input class="form-control" id="user-edit-password" type="password" autocomplete="new-password">
+    </div>
+    <div class="form-group" id="user-status-group">
+      <label>الحالة</label>
+      <select class="form-control" id="user-edit-status">
+        <option value="active">فعّال</option>
+        <option value="disabled">معطّل</option>
+      </select>
+    </div>
+    <div class="pa-modal-actions">
+      <button class="btn btn-outline" onclick="paCloseModal('modal-user')">إلغاء</button>
+      <button class="btn btn-primary" id="user-save-btn" onclick="saveUser()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Role create/edit ===== -->
+<div class="pa-modal-backdrop" id="modal-role">
+  <div class="pa-modal">
+    <h3 id="role-modal-title">دور جديد</h3>
+    <input type="hidden" id="role-edit-id">
+    <div class="form-group"><label>اسم الدور</label><input class="form-control" id="role-edit-name"></div>
+    <div class="form-group">
+      <label>الصلاحيات</label>
+      <div class="pa-checkbox-list" id="role-permissions-list"></div>
+    </div>
+    <div class="pa-modal-actions">
+      <button class="btn btn-outline" onclick="paCloseModal('modal-role')">إلغاء</button>
+      <button class="btn btn-primary" id="role-save-btn" onclick="saveRole()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  if (!PAAuth.isLoggedIn()) location.replace('/admin/login');
+  const paInfo = PAAuth.getUserInfo();
+  if (paInfo) document.getElementById('pa-admin-name').textContent = paInfo.full_name || paInfo.email;
+</script>
+<script src="/admin/static/js/dashboard.js"></script>
+{% endblock %}

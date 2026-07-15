@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     jwt_access_ttl_minutes: int = 15
     jwt_refresh_ttl_days: int = 30
 
+    # Platform-admin sessions are separate from tenant sessions (no refresh
+    # rotation yet - single long-lived access token), hence the longer TTL.
+    platform_admin_token_ttl_minutes: int = 480
+
     cors_origins: str = "*"
     log_level: str = "info"
 
@@ -65,6 +69,7 @@ def get_settings() -> Settings:
         jwt_secret=os.environ.get("JWT_SECRET", os.environ.get("SESSION_SECRET", "dev-only-insecure-secret-change-me")),
         jwt_access_ttl_minutes=int(os.environ.get("JWT_ACCESS_TTL_MINUTES", "15")),
         jwt_refresh_ttl_days=int(os.environ.get("JWT_REFRESH_TTL_DAYS", "30")),
+        platform_admin_token_ttl_minutes=int(os.environ.get("PLATFORM_ADMIN_TOKEN_TTL_MINUTES", "480")),
         cors_origins=os.environ.get("CORS_ORIGINS", "*"),
         log_level=os.environ.get("LOG_LEVEL", "info"),
     )

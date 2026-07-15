@@ -31,13 +31,20 @@ def create_access_token(
     roles: list[str],
     permissions: list[str],
     ttl_minutes: int,
+    scope: str = "tenant",
 ) -> str:
+    """`scope` distinguishes a normal tenant-user session ("tenant", the
+    default - backward compatible with every existing caller) from a
+    platform-superadmin session ("platform_admin", never tied to a tenant).
+    Consumers must check `scope` explicitly before trusting cross-tenant
+    claims - see modules/platform_admin/presentation/dependencies.py."""
     now = datetime.now(timezone.utc)
     payload: dict[str, Any] = {
         "sub": str(user_id),
         "tenant_id": str(tenant_id) if tenant_id else None,
         "roles": roles,
         "permissions": permissions,
+        "scope": scope,
         "iat": now,
         "exp": now + timedelta(minutes=ttl_minutes),
         "jti": str(uuid.uuid4()),

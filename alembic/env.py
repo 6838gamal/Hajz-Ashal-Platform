@@ -20,6 +20,7 @@ from app.settings import get_settings  # noqa: E402
 from modules.tenants.infrastructure import models as tenants_models  # noqa: E402,F401
 from modules.identity.infrastructure import models as identity_models  # noqa: E402,F401
 from modules.access_control.infrastructure import models as access_control_models  # noqa: E402,F401
+from modules.platform_admin.infrastructure import models as platform_admin_models  # noqa: E402,F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
